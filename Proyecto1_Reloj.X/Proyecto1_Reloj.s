@@ -1,16 +1,16 @@
  ; Archivo:	  main.s  
  ; Dispositivo:	  PIC16F887
- ; Autor:	  Javier López
+ ; Autor:	  Javier LÃ³pez
  ; Compilador:	  pic-as (v2.30), MPLAB V5.50
  ; 
  ; Programa:	  Reloj digital programable con displays de 7 segmentos
- ; Harware:	  Display de 7 segmentos multiplexado a 4 dígitos en puerto a,
+ ; Harware:	  Display de 7 segmentos multiplexado a 4 dÃ­gitos en puerto a,
  ;		  push buttons en puerto b, leds de estado en puerto c, 
  ;		  transistores npn con resistencias pull-up en puerto d,
- ;		  conexión DP del display de 7 segmentos en puerto e
+ ;		  conexiÃ³n DP del display de 7 segmentos en puerto e
  ; 
  ; Creado: 13 septiembre, 2021
- ; Última modificación: 21 septiembre, 2021
+ ; Ãšltima modificaciÃ³n: 21 septiembre, 2021
   
  PROCESSOR 16F887
  #include <xc.inc>
@@ -20,16 +20,16 @@
  CONFIG WDTE=OFF	    // WDT disabled (reinicio repetitivo del pic)
  CONFIG PWRTE=OFF	    // PWRT enabled (espera de 72ms al iniciar)
  CONFIG MCLRE=OFF	    // El pin de MCLR se utiliza como I/O
- CONFIG CP=OFF		    // Sin protección de código
- CONFIG CPD=OFF		    // Sin protección de datos
+ CONFIG CP=OFF		    // Sin protecciÃ³n de cÃ³digo
+ CONFIG CPD=OFF		    // Sin protecciÃ³n de datos
  
- CONFIG BOREN=OFF   // Sin reinicio cuando el voltaje de alimentación baja de 4V
+ CONFIG BOREN=OFF   // Sin reinicio cuando el voltaje de alimentaciÃ³n baja de 4V
  CONFIG IESO=OFF    // Reinicio sin cambio de reloj de interno a externo
  CONFIG FCMEN=OFF   // Cambio de reloj externo a interno en caso de fallo
- CONFIG LVP=OFF	    // programación en bajo voltaje permitida
+ CONFIG LVP=OFF	    // programaciÃ³n en bajo voltaje permitida
  
  ;configuration word 2
- CONFIG WRT=OFF		// Protección de autoescritura por el programa desactivada
+ CONFIG WRT=OFF		// ProtecciÃ³n de autoescritura por el programa desactivada
  CONFIG BOR4V=BOR40V	// Reinicio abajo de 4V, (BOR21V=2.1V)
  
  //============================================================================
@@ -45,6 +45,7 @@
     endm
  //=============================== RESET TMR1 =================================
  restart_tmr1 macro
+    banksel PORTA
     movlw   0xB		    // ingresar valor de 1seg, (0x0BDC) a TMR1
     movwf   TMR1H
     movlw   0xDC
@@ -74,7 +75,7 @@
     switch:	    DS  1	// switch de estado de los transistores
     switch_rb:	    DS	1	// switch de estado de los botones
     aux_div:	    DS  2	// variable auxiliar del macro divisor
-    aux_dias:	    DS	1	// variable aux para limitar los días del mes
+    aux_dias:	    DS	1	// variable aux para limitar los dÃ­as del mes
     aux_febrero:    DS	2	// variable aux para limitar febrero
     
     segundos:	    DS  1	// Variables acumuladoras de tiempo
@@ -88,13 +89,13 @@
     horas_d3:	    DS  1
     horas_d4:	    DS  1
     
-    meses_d1:	    DS  1	// Más variables que reciben los resultados de
+    meses_d1:	    DS  1	// MÃ¡s variables que reciben los resultados de
     meses_d2:	    DS  1	// las divisiones
     dias_d3:	    DS  1	 
     dias_d4:	    DS  1	
     
     mostrar_d1:	    DS  1	// variables que almacenan el valor que se
-    mostrar_d2:	    DS  1	// mostrará en los displays ya convertido
+    mostrar_d2:	    DS  1	// mostrarÃ¡ en los displays ya convertido
     mostrar_d3:	    DS  1	// por una tabla
     mostrar_d4:	    DS  1
 
@@ -106,16 +107,16 @@
  //================================== RESET ===================================
  //============================================================================
  PSECT resVect, class=CODE, abs, delta=2
- ORG 00h	// posición 0000h para el reset
+ ORG 00h	// posiciÃ³n 0000h para el reset
  resetVec:
      PAGESEL main
      goto main
      
  //============================================================================  
- //=========================== VECTOR INTERRUCPIÓN ============================  
+ //=========================== VECTOR INTERRUCPIÃ“N ============================  
  //============================================================================
  PSECT intVect, class=CODE, abs, delta=2
- ORG 04h			// posición 0004h para interrupciones
+ ORG 04h			// posiciÃ³n 0004h para interrupciones
  push:
     movwf	W_TEMP
     swapf	STATUS, W
@@ -137,7 +138,7 @@
     retfie
     
  //============================================================================   
- //====================== SUBRUTINAS DE INTERRUPCIÓN ==========================
+ //====================== SUBRUTINAS DE INTERRUPCIÃ“N ==========================
  //============================================================================
  
  //=========================== SUBRUTINAS DE TMR0 =============================
@@ -147,7 +148,7 @@
     
     btfss	switch,1	// cascada de comparaciones para determinar en 
     goto	estado_0x_t0	// cual de los 4 estados se encuentra el switch
-    goto	estado_1x_t0	// y así determinar cual transistor encender
+    goto	estado_1x_t0	// y asÃ­ determinar cual transistor encender
  estado_0x_t0:
     btfss	switch,0
     goto	estado_00_t0
@@ -199,11 +200,11 @@
     clrf	PORTC		// limpiar leds de estado
     
     btfss	PORTB,4		// salta si el pull-up sigue activo
-    incf	switch_rb	// cambiar de estado cada vez que se presione el botón
+    incf	switch_rb	// cambiar de estado cada vez que se presione el botÃ³n
     
     btfss	switch_rb,1	// cascada de comparaciones para determinar en 
     goto	estado_0x_rb	// cual de los 4 estados se encuentra el switch_rb
-    goto	estado_1x_rb	// y así determinar que acciones realizan los botones
+    goto	estado_1x_rb	// y asÃ­ determinar que acciones realizan los botones
  estado_0x_rb:
     btfss	switch_rb,0
     goto	estado_00_rb
@@ -214,12 +215,12 @@
     goto	estado_11_rb
     
  estado_00_rb:			// estado de lectura de hora
-    // los demás botones son inútiles en este estado, así que no se hace nada
+    // los demÃ¡s botones son inÃºtiles en este estado, asÃ­ que no se hace nada
     bcf		RBIF
     return
  estado_01_rb:			// estado de lectura de fecha
     bsf		PORTC,6
-    // los demás botones son inútiles en este estado, así que no se hace nada
+    // los demÃ¡s botones son inÃºtiles en este estado, asÃ­ que no se hace nada
     bcf		RBIF
     return
  estado_10_rb:			// estado de escritura de hora
@@ -249,7 +250,7 @@
     return
  //============================================================================
  PSECT code, delta=2, abs
- ORG 100h	    // posición 0100h para tabla
+ ORG 100h	    // posiciÃ³n 0100h para tabla
  //============================================================================
  //================================== TABLAS ==================================
  //============================================================================
@@ -267,17 +268,17 @@
     retlw   00000111B	// 7
     retlw   01111111B	// 8
     retlw   01101111B	// 9
-    retlw   00111111B	// 0 (Posición extra para evitar errores)
+    retlw   00111111B	// 0 (PosiciÃ³n extra para evitar errores)
  
  //============================================================================
  PSECT code, delta=2, abs
- ORG 130h	    // posición 0130h para tabla
+ ORG 130h	    // posiciÃ³n 0130h para tabla
  //============================================================================
  tabla_meses:
     clrf    PCLATH
     bsf	    PCLATH, 0	// PCLATH = 01	PCL = 02
     addwf   PCL		// PC = PCLATH + PCL + w
-    retlw   32	// (Posición extra para evitar errores)
+    retlw   32	// (PosiciÃ³n extra para evitar errores)
     retlw   32	// enero
     retlw   29	// febrero
     retlw   32	// marzo
@@ -290,9 +291,9 @@
     retlw   32	// octubre
     retlw   31	// noviembre
     retlw   32	// diciembre
-    retlw   32	// (Posición extra para evitar errores)
+    retlw   32	// (PosiciÃ³n extra para evitar errores)
  //============================================================================
- //================================== CÓDIGO ==================================
+ //================================== CÃ“DIGO ==================================
  //============================================================================
  
  
@@ -314,9 +315,9 @@
     call	inc_dias
     call	inc_meses
     
-    call	limites		// llamar a los límites que siguen las variables incrementadas
+    call	limites		// llamar a los lÃ­mites que siguen las variables incrementadas
     
-    call	fms		// llamar a la máquina de estados finitos
+    call	fms		// llamar a la mÃ¡quina de estados finitos
     
     goto	loop
  //============================================================================   
@@ -421,7 +422,7 @@
     bsf		TMR2IE	    // interrupcion del timer2 activada
     banksel	T1CON
     bsf		GIE	    // interrupciones globales activadas
-    bsf		PEIE	    // interrupciones periféricas activadas
+    bsf		PEIE	    // interrupciones perifÃ©ricas activadas
     bsf		RBIE	    // interrupcion del puerto b activada
     bsf		T0IE	    // interrupcion del timer0 activada
     bcf		T0IF	    // limpiar bandera de overflow de timer0
@@ -457,7 +458,7 @@
  fms:
     btfss	switch_rb,1	// cascada de comparaciones para determinar en 
     goto	estado_0x	// cual de los 4 estados se encuentra el switch_rb,
-    goto	estado_1x	// mismo switch de la interrupción iocb
+    goto	estado_1x	// mismo switch de la interrupciÃ³n iocb
  estado_0x:
     btfss	switch_rb,0
     goto	estado_00
@@ -482,58 +483,58 @@
  //======================== PREPARAR DISPLAYS (TMR0) ==========================
  divisores_tiempo:
     movf	minutos, w
-    wdivl	10, minutos_d2, minutos_d1  // división de minutos
+    wdivl	10, minutos_d2, minutos_d1  // divisiÃ³n de minutos
     call	prep_displays_minutos
     
     movf	horas, w
-    wdivl	10, horas_d4, horas_d3	    // división de horas
+    wdivl	10, horas_d4, horas_d3	    // divisiÃ³n de horas
     call	prep_displays_horas
     return
  prep_displays_minutos:
     movf	minutos_d1, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d1	// pasar a registro que se usará en interrup
+    movwf	mostrar_d1	// pasar a registro que se usarÃ¡ en interrup
     
     movf	minutos_d2, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d2	// pasar a registro que se usará en interrup
+    movwf	mostrar_d2	// pasar a registro que se usarÃ¡ en interrup
     return
  prep_displays_horas:
     movf	horas_d3, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d3	// pasar a registro que se usará en interrup
+    movwf	mostrar_d3	// pasar a registro que se usarÃ¡ en interrup
     
     movf	horas_d4, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d4	// pasar a registro que se usará en interrup
+    movwf	mostrar_d4	// pasar a registro que se usarÃ¡ en interrup
     return
  //============================================================================
   divisores_fecha:
     movf	dias, w
-    wdivl	10, dias_d4, dias_d3	    // división de minutos
+    wdivl	10, dias_d4, dias_d3	    // divisiÃ³n de minutos
     call	prep_displays_dias
     
     movf	meses, w
-    wdivl	10, meses_d2, meses_d1	    // división de horas
+    wdivl	10, meses_d2, meses_d1	    // divisiÃ³n de horas
     call	prep_displays_meses
     return
  prep_displays_dias:
     movf	dias_d3, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d3	// pasar a registro que se usará en interrup
+    movwf	mostrar_d3	// pasar a registro que se usarÃ¡ en interrup
     
     movf	dias_d4, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d4	// pasar a registro que se usará en interrup
+    movwf	mostrar_d4	// pasar a registro que se usarÃ¡ en interrup
     return
  prep_displays_meses:
     movf	meses_d1, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d1	// pasar a registro que se usará en interrup
+    movwf	mostrar_d1	// pasar a registro que se usarÃ¡ en interrup
     
     movf	meses_d2, w	// mover a w
     call	tabla		// convertir valor con la tabla
-    movwf	mostrar_d2	// pasar a registro que se usará en interrup
+    movwf	mostrar_d2	// pasar a registro que se usarÃ¡ en interrup
     return
  //======================= SUBRUTINAS DE LA HORA (TMR1) =======================   
  inc_minutos:
@@ -562,17 +563,17 @@
     return
  inc_meses:
     movf	meses, w	// mover el valor de mes actual a w
-    call	tabla_meses	// mover el límite de días del mes actual a w
-    subwf	dias, w		// restar el valor límite con el número actual
+    call	tabla_meses	// mover el lÃ­mite de dÃ­as del mes actual a w
+    subwf	dias, w		// restar el valor lÃ­mite con el nÃºmero actual
     btfss	STATUS,2	// saltar si el resultado de la resta es 0
     goto	return_t1
-    clrf	dias		// si se alcanzó el límite, reiniciar cuenta de días
+    clrf	dias		// si se alcanzÃ³ el lÃ­mite, reiniciar cuenta de dÃ­as
     bsf		dias,0		// setear dias en 1 como valor inicial
     incf	meses		// e incrementar el valor de meses
     return
  return_t1:
     return
- //========================== SUBRUTINAS DE LÍMITES ===========================
+ //========================== SUBRUTINAS DE LÃMITES ===========================
  limites:
     call	limite_minutos
     call	limite_horas
@@ -583,7 +584,7 @@
     call	limite_febrero_2
     return
  limite_minutos:
-    btfss	minutos,7	// chequear el bit más significativo
+    btfss	minutos,7	// chequear el bit mÃ¡s significativo
     goto	return_limites
     bcf		minutos,7
     bcf		minutos,6
@@ -595,7 +596,7 @@
     bsf		minutos,0	// actualizar al valor a .59 -> 00111011B
     return
  limite_horas:
-    btfss	horas,7		// revisar el bit más significativo
+    btfss	horas,7		// revisar el bit mÃ¡s significativo
     goto	return_limites
     bcf		horas,7
     bcf		horas,6
@@ -606,7 +607,7 @@
     bsf		horas,1
     bsf		horas,0		// actualizar al valor a .23 -> 00010111B
     return
- limite_inf_dias:		// incrementar de 0 a 1 automáticamente
+ limite_inf_dias:		// incrementar de 0 a 1 automÃ¡ticamente
     btfsc	dias,7		// revisar que cada bit sea 0
     goto	return_limites
     btfsc	dias,6
@@ -625,13 +626,13 @@
     goto	return_limites
     
     movf	meses,w		// mover meses a w
-    call	tabla_meses	// obtener el número de días que tiene el mes
-    movwf	aux_dias	// mover este número a variable auxiliar
-    decf	aux_dias	// reducir en uno, para ajustarse al último día hábil
+    call	tabla_meses	// obtener el nÃºmero de dÃ­as que tiene el mes
+    movwf	aux_dias	// mover este nÃºmero a variable auxiliar
+    decf	aux_dias	// reducir en uno, para ajustarse al Ãºltimo dÃ­a hÃ¡bil
     movf	aux_dias,w	// mover el valor del auxiliar a w
     movwf	dias		// mover w a dias
     return
- limite_inf_meses:		// incrementar de 0 a 12 automáticamente
+ limite_inf_meses:		// incrementar de 0 a 12 automÃ¡ticamente
     btfsc	meses,7		// revisar que cada bit sea 0
     goto	return_limites
     btfsc	meses,6
